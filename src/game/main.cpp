@@ -11,12 +11,12 @@
 #include <iostream>
 #include <string>
 
-#include "classes/player/player.hpp"
-#include "classes/world/world.hpp"
-#include "classes/world/clouds.hpp"
-#include "classes/physics/physics.hpp"
-#include "classes/raycast/raycast.hpp"
-#include "classes/ui/ui.hpp"
+#include "game/classes/entity/player/player.hpp"
+#include "game/classes/world/world.hpp"
+#include "game/classes/world/clouds/clouds.hpp"
+#include "game/classes/physics/physics.hpp"
+#include "game/classes/raycast/raycast.hpp"
+#include "game/classes/ui/ui.hpp"
 
 #include "utility/shader.hpp"
 #include "utility/shader_program.hpp"
@@ -29,7 +29,7 @@ const unsigned int SCR_HEIGHT = 720;
 const unsigned int SHADOW_WIDTH = 2048, SHADOW_HEIGHT = 2048;
 float fog_density = 0.5f;
 
-player cam;
+mcxx::classes::entities::player cam;
 
 float last_x = SCR_WIDTH / 2.0f;
 float last_y = SCR_HEIGHT / 2.0f;
@@ -54,8 +54,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-bool intersects_player(const glm::ivec3& block_pos, const player& player) {
-    aabb player_box = aabb::from_player_position(player.position, player.player_height, player.player_radius);
+bool intersects_player(const glm::ivec3& block_pos, const mcxx::classes::entities::player& plyr) {
+    aabb player_box = aabb::from_player_position(plyr.position, plyr.player_height, plyr.player_radius);
     aabb block_box = { glm::vec3(block_pos), glm::vec3(block_pos) + glm::vec3(1.0f) };
     return (player_box.min.x < block_box.max.x && player_box.max.x > block_box.min.x) &&
            (player_box.min.y < block_box.max.y && player_box.max.y > block_box.min.y) &&
@@ -113,14 +113,14 @@ int main() {
     // Load Sun Texture
     unsigned int sun_texture = load_texture_ui("assets/sprites/sun.png");
 
-    // Clouds yay!
+    // Clouds
     std::string cloud_vs = load_shader_source("src/shaders/clouds/clouds.vs");
     std::string cloud_fs = load_shader_source("src/shaders/clouds/clouds.fs");
 
     shader_program cloud_shader;
-    cloud_shader.load_from_source(cloud_vs, cloud_fs);
+    cloud_shader.load_from_source(cloud_vs.c_str(), cloud_fs.c_str());
 
-    // Hardcode the highlight shader because PEOPLE BETTER NOT MESS WITH THIS SHIT
+    // Highlight Shader
     std::string line_vs = "#version 330 core\n"
         "layout (location = 0) in vec3 a_pos;\n"
         "uniform mat4 model;\n"
@@ -133,11 +133,11 @@ int main() {
     std::string line_fs = "#version 330 core\n"
         "out vec4 frag_color;\n"
         "void main() {\n"
-        "   frag_color = vec4(0.0f, 0.0f, 0.0f, 1.0f); // Black outline/crosshair color\n"
+        "   frag_color = vec4(0.0f, 0.0f, 0.0f, 1.0f);\n"
         "}\0";
 
     shader_program line_shader;
-    line_shader.load_from_source(line_vs, line_fs);
+    line_shader.load_from_source(line_vs.c_str(), line_fs.c_str());
 
     // ==========================================
     // FRAMEBUFFER SETUP FOR SHADOW MAPPING
@@ -163,7 +163,7 @@ int main() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     // ==========================================
-    // SETUP VAOs (Wireframe, Crosshair, Sun)
+    // SETUP VAOs
     // ==========================================
     float wire_cube_vertices[] = {
         0.0f,0.0f,0.0f,  1.0f,0.0f,0.0f,  1.0f,0.0f,0.0f,  1.0f,1.0f,0.0f,
@@ -218,7 +218,7 @@ int main() {
     ui_renderer game_ui;
     game_ui.init();
 
-    cloud_renderer clouds;
+    mcxx::classes::cloud_renderer clouds;
     clouds.generate(cam.position);
 
     world my_world;
@@ -245,7 +245,7 @@ int main() {
             100.0f
         );
 
-        raycast_result hit = raycaster::cast(cam.position, cam.front, 4.0f, my_world);
+        mcxx::classes::raycast::raycast_result hit = mcxx::classes::raycast::raycaster::cast(cam.position, cam.front, 4.0f, my_world);
         bool left_pressed = (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
         bool right_pressed = (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS);
 
@@ -329,15 +329,9 @@ int main() {
         sun_shader.set_mat4("projection", projection);
         sun_shader.set_mat4("view", view);
 
-        // Position the sun far away in the sky direction
         glm::vec3 sun_world_pos = cam.position - light_dir * 400.0f;
+        glm::mat4 sun_model = glm::translate(glm::mat4(1.0f), sun_world_pos);
 
-        // Build a stable model matrix that faces the camera without tracking rotation weirdly,
-        // or simply align it perpendicular to the light direction vector.
-        glm::mat4 sun_model = glm::mat4(1.0f);
-        sun_model = glm::translate(sun_model, sun_world_pos);
-
-        // Face the sun flatly toward the camera's position cleanly
         glm::vec3 to_camera = glm::normalize(cam.position - sun_world_pos);
         glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
         glm::vec3 right = glm::normalize(glm::cross(up, to_camera));
@@ -350,7 +344,7 @@ int main() {
         sun_model = glm::scale(sun_model, glm::vec3(45.0f));
         sun_shader.set_mat4("model", sun_model);
 
-        glDisable(GL_CULL_FACE); // Ensure backface culling doesn't hide the quad
+        glDisable(GL_CULL_FACE);
         glDepthMask(GL_FALSE);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -365,7 +359,7 @@ int main() {
 
         glDisable(GL_BLEND);
         glDepthMask(GL_TRUE);
-        glEnable(GL_CULL_FACE); // Re-enable culling for terrain
+        glEnable(GL_CULL_FACE);
 
         // ==========================================
         // PASS 3.5: RENDER PERLIN NOISE CLOUDS
@@ -391,7 +385,7 @@ int main() {
         // PASS 4: RENDER BLOCK HIGHLIGHT WIREFRAME
         // ==========================================
         if (hit.hit) {
-            line_shader.use(); // Use the dedicated line shader
+            line_shader.use();
             glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(hit.block_pos));
             model = glm::scale(model, glm::vec3(1.002f));
             line_shader.set_mat4("model", model);
@@ -411,7 +405,7 @@ int main() {
         glm::mat4 ortho = glm::ortho(0.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, 0.0f, -1.0f, 1.0f);
         glm::mat4 cross_model = glm::translate(glm::mat4(1.0f), glm::vec3(SCR_WIDTH / 2.0f, SCR_HEIGHT / 2.0f, 0.0f));
 
-        line_shader.use(); // Use the dedicated line shader
+        line_shader.use();
         line_shader.set_mat4("projection", ortho);
         line_shader.set_mat4("view", glm::mat4(1.0f));
         line_shader.set_mat4("model", cross_model);

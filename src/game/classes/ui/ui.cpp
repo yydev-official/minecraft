@@ -45,8 +45,8 @@ void ui_renderer::render(unsigned int screen_width, unsigned int screen_height) 
     ImGui::NewFrame();
 
     float scale = 2.0f; // Keep your preferred scale value
-    float hotbar_width = 288.0f * scale;
-    float hotbar_height = 32.0f * scale;
+    float hotbar_width = 292.0f * scale;
+    float hotbar_height = 36.0f * scale;
 
     // Calculate slot width and selector size first so we know how much vertical overflow we have
     float slot_width = hotbar_width / 9.0f;

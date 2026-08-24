@@ -4,7 +4,7 @@
 #include <string>
 #include <mutex>
 
-namespace cc::classes {
+namespace mcxx::classes {
     class logger {
     	public:
     		static void log(const std::string& msg, ...);
