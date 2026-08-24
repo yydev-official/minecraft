@@ -1,6 +1,6 @@
 # MCXX
 
-MCXx is a small voxel renderer built with OpenGL 3.3. It generates terrain from Perlin noise, streams chunks around the player, builds visible block faces into GPU meshes, and renders shadows, clouds, a sun sprite, block selection, and an ImGui hotbar.
+MCXX is a small voxel renderer built with OpenGL 3.3. It generates terrain from Perlin noise, streams chunks around the player, builds visible block faces into GPU meshes, and renders shadows, clouds, a sun sprite, block selection, and an ImGui hotbar.
 
 ## Requirements
 
