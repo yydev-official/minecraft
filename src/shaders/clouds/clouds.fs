@@ -7,7 +7,6 @@ uniform float fog_density;
 void main() {
     vec3 cloud_color = vec3(1.0f, 1.0f, 1.0f);
 
-    // --- FOG CALCULATION ---
     float dist = length(view_pos - frag_pos);
 
     float fog_start = 50.0;

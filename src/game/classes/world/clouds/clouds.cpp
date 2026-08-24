@@ -14,12 +14,10 @@ namespace mcxx::classes {
         int center_x = static_cast<int>(player_pos.x);
         int center_z = static_cast<int>(player_pos.z);
 
-        // Generate in a circular radius so there are no square grid corners visible
         for (int x = -render_radius; x <= render_radius; ++x)
         {
             for (int z = -render_radius; z <= render_radius; ++z)
             {
-                // Circular distance check eliminates square box corners
                 if (x * x + z * z > render_radius * render_radius)
                     continue;
 
@@ -28,7 +26,6 @@ namespace mcxx::classes {
 
                 double noise_val = perlin.octave2D_01(world_x * scale, world_z * scale, 3);
 
-                // Inverted space check for sweeping cloud fields with gaps
                 if (noise_val < 0.52f)
                 {
                     float size = 1.0f;
@@ -38,7 +35,6 @@ namespace mcxx::classes {
                     float z1 = z0 + size;
 
                     float quad[] = {
-                        // Top face
                         x0, cloud_y, z1,
                         x1, cloud_y, z1,
                         x1, cloud_y, z0,
@@ -47,7 +43,6 @@ namespace mcxx::classes {
                         x1, cloud_y, z0,
                         x0, cloud_y, z0,
 
-                        // Bottom face
                         x0, cloud_y, z0,
                         x1, cloud_y, z0,
                         x1, cloud_y, z1,

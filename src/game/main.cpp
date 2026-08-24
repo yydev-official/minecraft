@@ -77,7 +77,6 @@ int main() {
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) return -1;
 
-    // Initialize ImGui
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
@@ -88,9 +87,6 @@ int main() {
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 
-    // ==========================================
-    // SHADERS SETUP USING WRAPPER
-    // ==========================================
     std::string depth_vs = load_shader_source("src/shaders/depth/depth.vs");
     std::string depth_fs = load_shader_source("src/shaders/depth/depth.fs");
 
@@ -103,24 +99,20 @@ int main() {
     shader_program chunk_shader;
     chunk_shader.load_from_source(chunk_vs.c_str(), chunk_fs.c_str());
 
-    // Sun Shader Source
     std::string sun_vs = load_shader_source("src/shaders/sun/sun.vs");
     std::string sun_fs = load_shader_source("src/shaders/sun/sun.fs");
 
     shader_program sun_shader;
     sun_shader.load_from_source(sun_vs.c_str(), sun_fs.c_str());
 
-    // Load Sun Texture
     unsigned int sun_texture = load_texture_ui("assets/sprites/sun.png");
 
-    // Clouds
     std::string cloud_vs = load_shader_source("src/shaders/clouds/clouds.vs");
     std::string cloud_fs = load_shader_source("src/shaders/clouds/clouds.fs");
 
     shader_program cloud_shader;
     cloud_shader.load_from_source(cloud_vs.c_str(), cloud_fs.c_str());
 
-    // Highlight Shader
     std::string line_vs = "#version 330 core\n"
         "layout (location = 0) in vec3 a_pos;\n"
         "uniform mat4 model;\n"
@@ -139,9 +131,6 @@ int main() {
     shader_program line_shader;
     line_shader.load_from_source(line_vs.c_str(), line_fs.c_str());
 
-    // ==========================================
-    // FRAMEBUFFER SETUP FOR SHADOW MAPPING
-    // ==========================================
     unsigned int depth_map_fbo;
     glGenFramebuffers(1, &depth_map_fbo);
 
@@ -162,9 +151,6 @@ int main() {
     glReadBuffer(GL_NONE);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    // ==========================================
-    // SETUP VAOs
-    // ==========================================
     float wire_cube_vertices[] = {
         0.0f,0.0f,0.0f,  1.0f,0.0f,0.0f,  1.0f,0.0f,0.0f,  1.0f,1.0f,0.0f,
         1.0f,1.0f,0.0f,  0.0f,1.0f,0.0f,  0.0f,1.0f,0.0f,  0.0f,0.0f,0.0f,
@@ -212,9 +198,6 @@ int main() {
     glEnableVertexAttribArray(1);
     glBindVertexArray(0);
 
-    // ==========================================
-    // INITIALIZE UI
-    // ==========================================
     ui_renderer game_ui;
     game_ui.init();
 
@@ -277,9 +260,6 @@ int main() {
         glm::mat4 light_view = glm::lookAt(light_pos, cam.position, glm::vec3(0.0f, 1.0f, 0.0f));
         glm::mat4 light_space_matrix = light_projection * light_view;
 
-        // ==========================================
-        // PASS 1: RENDER TO SHADOW MAP
-        // ==========================================
         glBindFramebuffer(GL_FRAMEBUFFER, depth_map_fbo);
         glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -294,9 +274,6 @@ int main() {
             glDrawArrays(GL_TRIANGLES, 0, chunk_obj.mesh.vertex_count);
         }
 
-        // ==========================================
-        // PASS 2: RENDER SCENE WITH SHADOWS
-        // ==========================================
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
         glClearColor(0.53f, 0.81f, 0.92f, 1.0f);
@@ -322,9 +299,6 @@ int main() {
             glDrawArrays(GL_TRIANGLES, 0, chunk_obj.mesh.vertex_count);
         }
 
-        // ==========================================
-        // PASS 3: RENDER SUN
-        // ==========================================
         sun_shader.use();
         sun_shader.set_mat4("projection", projection);
         sun_shader.set_mat4("view", view);
@@ -361,9 +335,6 @@ int main() {
         glDepthMask(GL_TRUE);
         glEnable(GL_CULL_FACE);
 
-        // ==========================================
-        // PASS 3.5: RENDER PERLIN NOISE CLOUDS
-        // ==========================================
         cloud_shader.use();
         cloud_shader.set_mat4("projection", projection);
         cloud_shader.set_mat4("view", view);
@@ -381,9 +352,6 @@ int main() {
         glDepthMask(GL_TRUE);
         glEnable(GL_CULL_FACE);
 
-        // ==========================================
-        // PASS 4: RENDER BLOCK HIGHLIGHT WIREFRAME
-        // ==========================================
         if (hit.hit) {
             line_shader.use();
             glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(hit.block_pos));
@@ -398,9 +366,6 @@ int main() {
             glBindVertexArray(0);
         }
 
-        // ==========================================
-        // PASS 5: RENDER 2D CROSSHAIR
-        // ==========================================
         glDisable(GL_DEPTH_TEST);
         glm::mat4 ortho = glm::ortho(0.0f, (float)SCR_WIDTH, (float)SCR_HEIGHT, 0.0f, -1.0f, 1.0f);
         glm::mat4 cross_model = glm::translate(glm::mat4(1.0f), glm::vec3(SCR_WIDTH / 2.0f, SCR_HEIGHT / 2.0f, 0.0f));
@@ -416,9 +381,6 @@ int main() {
         glBindVertexArray(0);
         glEnable(GL_DEPTH_TEST);
 
-        // ==========================================
-        // PASS 6: RENDER UI / HOTBAR
-        // ==========================================
         game_ui.render(SCR_WIDTH, SCR_HEIGHT);
 
         glfwSwapBuffers(window);

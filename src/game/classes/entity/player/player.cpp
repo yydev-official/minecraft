@@ -42,13 +42,11 @@ namespace mcxx::classes::entities {
             movement_dir = glm::normalize(movement_dir);
             glm::vec3 velocity = movement_dir * current_speed * deltaTime;
 
-            // Test X movement[cite: 1]
             position.x += velocity.x;
             if (physics::check_collision(aabb::from_player_position(position, player_height, player_radius), my_world)) {
                 position.x -= velocity.x;
             }
 
-            // Test Z movement[cite: 1]
             position.z += velocity.z;
             if (physics::check_collision(aabb::from_player_position(position, player_height, player_radius), my_world)) {
                 position.z -= velocity.z;
@@ -73,7 +71,6 @@ namespace mcxx::classes::entities {
             if (space_pressed) position.y += fly_speed * deltaTime;
             if (ctrl_pressed) position.y -= fly_speed * deltaTime;
         } else {
-            // Walking physics & Gravity[cite: 1]
             if (is_grounded && space_pressed && !space_was_pressed) {
                 velocity_y = jump_force;
                 is_grounded = false;
@@ -82,7 +79,6 @@ namespace mcxx::classes::entities {
             velocity_y += gravity * deltaTime;
             position.y += velocity_y * deltaTime;
 
-            // Downward raycast check for landing[cite: 1]
             glm::vec3 ray_origin = position - glm::vec3(0.0f, player_height, 0.0f);
             raycast::raycast_result ground_check = raycast::raycaster::cast(ray_origin, glm::vec3(0.0f, -1.0f, 0.0f), 0.2f, my_world);
 
@@ -97,7 +93,6 @@ namespace mcxx::classes::entities {
 
         space_was_pressed = space_pressed;
 
-        // Sync base entity integer position block tracker with exact physics coordinates
         position_block = maths::vector_3d(static_cast<int>(position.x), static_cast<int>(position.y), static_cast<int>(position.z));
     }
 
@@ -119,10 +114,8 @@ namespace mcxx::classes::entities {
     }
 
     void player::update() {
-        // Override base entity update loop if needed
     }
 
     void player::render() {
-        // Render entity model if applicable
     }
 }

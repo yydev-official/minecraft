@@ -37,20 +37,18 @@ void main() {
     float shadow = calculate_shadow(frag_pos_light_space);
     vec3 lighting = (ambient + (1.0 - shadow) * diffuse);
 
-    // --- FOG CALCULATION ---
     float dist = length(view_pos - frag_pos);
 
-    float fog_start = 50.0; // Clear zone radius around player
-    float fog_end = 75.0;   // Fully fogged distance
+    float fog_start = 50.0;
+    float fog_end = 75.0;
 
-    // Explicitly force full clarity (1.0) if closer than fog_start
     float fog_factor = 1.0;
     if (dist > fog_start) {
         fog_factor = (fog_end - dist) / (fog_end - fog_start);
     }
     fog_factor = clamp(fog_factor, 0.0, 1.0);
 
-    vec3 fog_color = vec3(0.53f, 0.81f, 0.92f); // Sky blue
+    vec3 fog_color = vec3(0.53f, 0.81f, 0.92f);
     vec3 final_color = mix(fog_color, lighting, fog_factor);
 
     frag_color = vec4(final_color, 1.0f);

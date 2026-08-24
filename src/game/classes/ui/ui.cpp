@@ -44,18 +44,15 @@ void ui_renderer::render(unsigned int screen_width, unsigned int screen_height) 
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    float scale = 2.0f; // Keep your preferred scale value
+    float scale = 2.0f;
     float hotbar_width = 292.0f * scale;
     float hotbar_height = 36.0f * scale;
 
-    // Calculate slot width and selector size first so we know how much vertical overflow we have
     float slot_width = hotbar_width / 9.0f;
     float selector_size = slot_width * 1.05f;
 
-    // Calculate how much the selector sticks out above the hotbar
     float vertical_overflow = (selector_size - hotbar_height) * 0.5f;
 
-    // Make the ImGui window taller to accommodate the overflow, and shift its position up
     float window_height = hotbar_height + (vertical_overflow * 2.0f);
     ImVec2 window_pos = ImVec2((screen_width - hotbar_width) * 0.5f, screen_height - window_height - 30.0f);
 
@@ -73,18 +70,15 @@ void ui_renderer::render(unsigned int screen_width, unsigned int screen_height) 
 
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-    // Push the drawing down by the vertical overflow amount so the hotbar stays at the bottom
     ImVec2 p0 = ImVec2(ImGui::GetCursorScreenPos().x, ImGui::GetCursorScreenPos().y + vertical_overflow);
     ImVec2 p1 = ImVec2(p0.x + hotbar_width, p0.y + hotbar_height);
 
-    // Render Hotbar Background Texture
     draw_list->AddImage(
         (ImTextureID)(uintptr_t)hotbar_texture,
         p0, p1,
         ImVec2(0, 0), ImVec2(1, 1)
     );
 
-    // Position of the active slot selector
     float active_x = p0.x + (active_slot * slot_width) - (selector_size - slot_width) * 0.5f;
     float active_y = p0.y - (selector_size - hotbar_height) * 0.5f;
 
@@ -95,7 +89,6 @@ void ui_renderer::render(unsigned int screen_width, unsigned int screen_height) 
         ImVec2(0, 0), ImVec2(1, 1)
     );
 
-    // Invisible buttons over each slot for mouse clicks
     for (int i = 0; i < 9; ++i) {
         ImGui::SetCursorScreenPos(ImVec2(p0.x + (i * slot_width), p0.y));
         std::string label = "##slot" + std::to_string(i);

@@ -15,7 +15,6 @@
 namespace mcxx::classes::entities {
     class player : public entity {
         public:
-            // Precise floating-point position for fluid movement & physics
             glm::vec3 position{8.0f, 85.0f, 16.0f};
 
             glm::vec3 front{0.0f, 0.0f, -1.0f};
@@ -27,7 +26,6 @@ namespace mcxx::classes::entities {
             float sprintMultiplier = 2.0f;
             float mouseSensitivity = 0.1f;
 
-            // Physics & Movement States
             bool is_flying = false;
             bool is_crouching = false;
             float velocity_y = 0.0f;
@@ -40,7 +38,6 @@ namespace mcxx::classes::entities {
             float crouch_height = 1.4f;
             float player_radius = 0.3f;
 
-            // Double-tap space tracking
             float last_space_press_time = 0.0f;
             bool space_was_pressed = false;
 

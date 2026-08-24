@@ -19,7 +19,6 @@ void chunk::generate_terrain(int world_offset_x, int world_offset_z) {
 
     for (int x = 0; x < CHUNK_WIDTH; x++) {
         for (int z = 0; z < CHUNK_LENGTH; z++) {
-            // Offset the noise coordinates by the chunk's actual world position
             double nx = static_cast<double>(x + world_offset_x) * 0.05;
             double nz = static_cast<double>(z + world_offset_z) * 0.05;
 

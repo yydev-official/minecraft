@@ -1,16 +1,13 @@
 #include "world.hpp"
 
 void world::update(const glm::vec3& player_pos) {
-    // 1. Determine which chunk the player is currently standing in
     int player_chunk_x = static_cast<int>(std::floor(player_pos.x / CHUNK_WIDTH));
     int player_chunk_z = static_cast<int>(std::floor(player_pos.z / CHUNK_LENGTH));
 
-    // 2. Loop through the render distance box around the player
     for (int x = player_chunk_x - render_distance; x <= player_chunk_x + render_distance; x++) {
         for (int z = player_chunk_z - render_distance; z <= player_chunk_z + render_distance; z++) {
             chunk_coord coord = {x, z};
 
-            // If the chunk doesn't exist yet, generate it!
             if (chunks.find(coord) == chunks.end()) {
                 rendered_chunk rc;
                 rc.data = std::make_unique<chunk>();
@@ -25,8 +22,6 @@ void world::update(const glm::vec3& player_pos) {
         }
     }
 
-    // 3. Optional: Unload chunks that are outside the render distance to save memory
-    // (Iterate through 'chunks' and erase any where abs(coord.x - player_chunk_x) > render_distance, etc.)
 }
 
 void world::set_block_at(int x, int y, int z, block_id id) {
@@ -43,7 +38,6 @@ void world::set_block_at(int x, int y, int z, block_id id) {
 
         if (y >= 0 && y < CHUNK_HEIGHT) {
             it->second.data->set_block(local_x, y, local_z, id);
-            // Rebuild the mesh for this chunk so the change renders immediately!
             it->second.mesh = chunk_mesh_builder::build(*it->second.data);
         }
     }

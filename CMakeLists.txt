@@ -8,7 +8,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(FetchContent)
 
-# Fetch GLFW (Window & Input)
 FetchContent_Declare(
     glfw
     GIT_REPOSITORY https://github.com/glfw/glfw.git
@@ -19,7 +18,6 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glfw)
 
-# Fetch GLM (3D Math)
 FetchContent_Declare(
     glm
     GIT_REPOSITORY https://github.com/g-truc/glm.git
@@ -27,13 +25,11 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glm)
 
-# Recursively find all source files in the src/ directory
 file(GLOB_RECURSE SOURCES
     "src/*.cpp"
     "src/*.hpp"
 )
 
-# Target Executable with ImGui local source files & backends
 add_executable(mcxx
     ${SOURCES}
     vendor/glad/src/glad.c

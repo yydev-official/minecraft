@@ -18,7 +18,6 @@ namespace mcxx::classes::raycast {
                     result.block_pos = voxel;
                     result.distance = current_dist;
 
-                    // Calculate adjacent position by stepping backwards slightly along the ray
                     glm::vec3 prev_point = origin + direction * (current_dist - step);
                     result.adjacent_pos = glm::ivec3(std::floor(prev_point.x), std::floor(prev_point.y), std::floor(prev_point.z));
                     return result;

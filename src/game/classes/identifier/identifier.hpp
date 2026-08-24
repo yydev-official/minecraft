@@ -12,7 +12,6 @@ namespace mcxx::classes {
 
         int get_id() { return id; };
 
-        // Comparison operators so identifiers can be used as keys in maps or compared
         bool operator==(const identifier& other) const {
             return id == other.id;
         }

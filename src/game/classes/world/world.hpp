@@ -7,7 +7,6 @@
 #include "game/classes/chunk/chunk.hpp"
 #include "game/classes/mesh/mesh.hpp"
 
-// A simple hash structure to use a 2D coordinate pair as a map key
 struct chunk_coord {
     int x;
     int z;
@@ -35,12 +34,11 @@ struct rendered_chunk {
 class world {
     private:
         std::unordered_map<chunk_coord, rendered_chunk, chunk_hash> chunks;
-        int render_distance = 4; // e.g., 9x9 grid around the player
+        int render_distance = 4;
 
     public:
         void update(const glm::vec3& player_pos);
 
-        // Set a block at absolute world coordinates
         void set_block_at(int x, int y, int z, block_id id);
 
         const std::unordered_map<chunk_coord, rendered_chunk, chunk_hash>& get_chunks() const;

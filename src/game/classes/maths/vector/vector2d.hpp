@@ -15,28 +15,23 @@ namespace mcxx::classes::maths {
             x_pos(static_cast<int>(x_pos)), 
             y_pos(static_cast<int>(y_pos)) {};
 
-        // Increment operator
         void operator++() {
             x_pos++;
             y_pos++;
         }
 
-        // Addition operator
         vector_2d operator+(const vector_2d& other) const {
             return {x_pos + other.x_pos, y_pos + other.y_pos};
         }
 
-        // Subtraction operator
         vector_2d operator-(const vector_2d& other) const {
             return {x_pos - other.x_pos, y_pos - other.y_pos};
         }
 
-        // Multiplication operator (scaling by an integer)
         vector_2d operator*(int scalar) const {
             return {x_pos * scalar, y_pos * scalar};
         }
 
-        // Multiplication operator (scaling by another vector3d)
         vector_2d operator*(const vector_2d& scalar) const {
             return {x_pos * scalar.x_pos, y_pos * scalar.y_pos};
         }
